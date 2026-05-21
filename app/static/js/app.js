@@ -17,15 +17,15 @@ function renderModels() {
     Object.keys(modelsData).forEach(key => {
         const m = modelsData[key];
         const card = document.createElement('div');
-        card.className = `model-card p-5 border border-zinc-800 dark:border-zinc-300 bg-zinc-900 dark:bg-white rounded-3xl cursor-pointer ${selectedModel === key ? 'selected ring-1 ring-indigo-500' : ''}`;
+        card.className = `model-card p-5 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 rounded-3xl cursor-pointer transition-all hover:border-zinc-300 dark:hover:border-zinc-600 ${selectedModel === key ? 'selected ring-2 ring-indigo-500' : ''}`;
         card.innerHTML = `
             <div class="flex justify-between items-start">
                 <div>
                     <div class="font-semibold text-lg">${m.name}</div>
-                    <div class="text-xs text-zinc-400 mt-px">${m.desc}</div>
+                    <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-px">${m.desc}</div>
                 </div>
                 <div class="text-right">
-                    <div class="text-emerald-400 font-semibold text-xl metric-value">${(m.accuracy * 100).toFixed(0)}<span class="text-sm">%</span></div>
+                    <div class="text-emerald-500 dark:text-emerald-400 font-semibold text-xl metric-value">${(m.accuracy * 100).toFixed(0)}<span class="text-sm">%</span></div>
                     <div class="text-[10px] text-emerald-400/70 -mt-1">ACCURACY</div>
                 </div>
             </div>
@@ -56,9 +56,9 @@ function renderInputs() {
         const div = document.createElement('div');
         div.innerHTML = `
             <div>
-                <label class="block text-xs font-medium text-zinc-400 dark:text-zinc-600 mb-1.5">${feat}</label>
+                <label class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">${feat}</label>
                 <input type="number" step="0.01" id="feat-${i}" 
-                       class="w-full px-4 h-11 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 focus:border-indigo-500 dark:focus:border-indigo-400 rounded-2xl text-sm outline-none transition-all text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400" 
+                       class="w-full px-4 h-11 bg-white dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 focus:border-indigo-500 dark:focus:border-indigo-400 rounded-2xl text-sm outline-none transition-all text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 shadow-sm" 
                        placeholder="0.00" value="${i < 2 ? '34.0' : i === 2 ? '0.5' : i === 3 ? '65' : i === 4 ? '70' : i === 5 ? '10' : '8'}">
             </div>
         `;
@@ -127,12 +127,14 @@ function init() {
     renderModels();
     renderInputs();
     
-    // Restore theme properly
+    // Restore theme properly (Facebook-style)
     const html = document.documentElement;
     const icon = document.getElementById('theme-icon');
-    const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
     
-    if (localStorage.theme === 'light' || (!localStorage.theme && prefersLight)) {
+    const storedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
         html.classList.add('dark');
         if (icon) icon.classList.replace('fa-moon', 'fa-sun');
     } else {
@@ -148,12 +150,14 @@ function toggleTheme() {
     const icon = document.getElementById('theme-icon');
     
     if (html.classList.contains('dark')) {
+        // Switch to light
         html.classList.remove('dark');
-        localStorage.theme = 'dark';
+        localStorage.setItem('theme', 'light');
         if (icon) icon.classList.replace('fa-sun', 'fa-moon');
     } else {
+        // Switch to dark
         html.classList.add('dark');
-        localStorage.theme = 'light';
+        localStorage.setItem('theme', 'dark');
         if (icon) icon.classList.replace('fa-moon', 'fa-sun');
     }
 }
